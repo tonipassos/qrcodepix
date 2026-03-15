@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Gerador de QR Code</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        /* MENU */
+        .menu {
+            background: #222;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* ANUNCIO */
+        .ads {
+            width: 100%;
+            min-height: 80px;
+            background: #ddd;
+            text-align: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* CONTAINER */
+        .container {
+            padding: 10px;
+        }
+
+        /* CAIXA */
+        .box {
+            background: white;
+            max-width: 420px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            font-size: 18px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+
+        button:hover {
+            background: darkgreen;
+        }
+
+        /* RESPONSIVO */
+        @media (max-width: 600px) {
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .box {
+                padding: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- MENU -->
+    <div class="menu">
+
+        <div class="logo">
+            Meu Site QR Code
+        </div>
+
+    </div>
+
+
+    <!-- ANUNCIO CIMA -->
+    <div class="ads">
+
+        COLE AQUI O CODIGO DO ANUNCIO
+
+    </div>
+
+
+    <div class="container">
+
+        <div class="box">
+
+            <h2>Gerar QR Code</h2>
+
+            <form action="/pagar" method="post">
+
+                <input name="link" placeholder="Digite o link">
+
+                <button type="submit">
+                    Gerar QR Code (R$10.00)
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ANUNCIO BAIXO -->
+    <div class="ads">
+
+        COLE AQUI O CODIGO DO ANUNCIO
+
+    </div>
+
+
+</body>
+
+</html>
