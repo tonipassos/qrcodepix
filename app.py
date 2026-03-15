@@ -64,10 +64,17 @@ def gerar():
 
     link = request.args.get("link")
 
-    img = qrcode.make(link)
-    img.save("qr.png")
+    if not link:
+        return "Link vazio"
 
-    return send_file("qr.png", as_attachment=True)
+    import qrcode
+
+    img = qrcode.make(link)
+
+    caminho = "qr.png"
+    img.save(caminho)
+
+    return send_file(caminho, as_attachment=True)
 
 
 app.run(host="0.0.0.0", port=10000)
