@@ -4,7 +4,7 @@ import qrcode
 
 app = Flask(__name__)
 
-sdk = mercadopago.SDK("SEU_ACCESS_TOKEN")
+sdk = mercadopago.SDK("APP_USR-7805412692690237-072118-7991a0a58b9308b5461fdca4530de68d__LC_LB__-219875516")
 
 pagamento_ok = False
 
@@ -31,8 +31,8 @@ def pagar():
         ],
 
         "back_urls": {
-            "success": "https://SEUSITE.onrender.com/sucesso",
-            "failure": "https://SEUSITE.onrender.com/erro"
+            "success": "https://qrcodepix.onrender.com/sucesso",
+            "failure": "https://qrcodepix.onrender.com/erro"
         },
 
         "auto_return": "approved"
