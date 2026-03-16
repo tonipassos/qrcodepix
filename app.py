@@ -6,7 +6,6 @@ import os
 
 app = Flask(__name__)
 
-
 # TOKEN do Render Environment
 token = os.environ.get("MP_TOKEN")
 
@@ -26,34 +25,37 @@ def home():
 def pagar():
 
     tipo = request.form.get("tipo")
+
     link = request.form.get("link")
     chave = request.form.get("chave")
     nome = request.form.get("nome")
-    cidade = request.form.get("cidade")
-    valor = request.form.get("valor")
 
-    # ✅ validação
+    # validação
 
     if not tipo:
         return redirect("/aviso?msg=Escolha o tipo")
 
-    if tipo == "site" and not link:
-        return redirect("/aviso?msg=Digite o link")
+    if tipo == "site":
 
-    if tipo == "pix" and not chave:
-        return redirect("/aviso?msg=Digite a chave PIX")
+        if not link:
+            return redirect("/aviso?msg=Digite o link")
 
-    if tipo == "pix" and not nome:
-        return redirect("/aviso?msg=Digite o nome")
-
-    if tipo == "pix" and not cidade:
-        return redirect("/aviso?msg=Digite a cidade")
-
-    if tipo == "pix" and not valor:
-        return redirect("/aviso?msg=Digite o valor")
+        dados = f"tipo=site&link={link}"
 
 
-    dados = f"tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
+    elif tipo == "pix":
+
+        if not chave:
+            return redirect("/aviso?msg=Digite a chave PIX")
+
+        if not nome:
+            return redirect("/aviso?msg=Digite o nome")
+
+        dados = f"tipo=pix&chave={chave}&nome={nome}"
+
+
+    else:
+        return redirect("/aviso?msg=Tipo invalido")
 
 
     preference_data = {
@@ -75,7 +77,6 @@ def pagar():
         "auto_return": "approved"
     }
 
-
     preference = sdk.preference().create(preference_data)
 
     return redirect(preference["response"]["init_point"])
@@ -90,11 +91,9 @@ def sucesso():
     link = request.args.get("link")
     chave = request.args.get("chave")
     nome = request.args.get("nome")
-    cidade = request.args.get("cidade")
-    valor = request.args.get("valor")
 
     return redirect(
-        f"/gerar?tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
+        f"/gerar?tipo={tipo}&link={link}&chave={chave}&nome={nome}"
     )
 
 
@@ -119,24 +118,15 @@ def gerar():
 
         chave = request.args.get("chave")
         nome = request.args.get("nome")
-        cidade = request.args.get("cidade")
-        valor = request.args.get("valor")
 
         if not chave:
-            return redirect("/aviso?msg=Chave PIX vazia")
+            return redirect("/aviso?msg=Chave vazia")
 
-        dados = f"""
-000201
-26360014BR.GOV.BCB.PIX01{len(chave):02}{chave}
-52040000
-5303986
-54{len(valor):02}{valor}
-5802BR
-59{len(nome):02}{nome}
-60{len(cidade):02}{cidade}
-62070503***
-6304
-"""
+        if not nome:
+            return redirect("/aviso?msg=Nome vazio")
+
+        dados = f"PIX:{chave}:{nome}"
+
 
     else:
         return redirect("/aviso?msg=Tipo invalido")
