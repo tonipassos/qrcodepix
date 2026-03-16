@@ -5,7 +5,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-sdk = mercadopago.SDK("SEU_TOKEN")
+sdk = mercadopago.SDK("APP_USR-7805412692690237-072118-7991a0a58b9308b5461fdca4530de68d__LC_LB__-219875516")
 
 pagamento_ok = False
 link_salvo = ""
