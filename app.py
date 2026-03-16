@@ -54,7 +54,7 @@ def sucesso():
     return render_template("sucesso.html")
 
 
-@app.route("/gerar")
+@app.route("/gerar", methods=["GET", "POST"])
 def gerar():
 
     global pagamento_ok
