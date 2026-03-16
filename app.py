@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 
-# TOKEN pelo Environment do Render
+# TOKEN do Render Environment
 token = os.environ.get("MP_TOKEN")
 
 sdk = mercadopago.SDK(token)
@@ -32,7 +32,29 @@ def pagar():
     cidade = request.form.get("cidade")
     valor = request.form.get("valor")
 
+    # ✅ validação
+
+    if not tipo:
+        return redirect("/aviso?msg=Escolha o tipo")
+
+    if tipo == "site" and not link:
+        return redirect("/aviso?msg=Digite o link")
+
+    if tipo == "pix" and not chave:
+        return redirect("/aviso?msg=Digite a chave PIX")
+
+    if tipo == "pix" and not nome:
+        return redirect("/aviso?msg=Digite o nome")
+
+    if tipo == "pix" and not cidade:
+        return redirect("/aviso?msg=Digite a cidade")
+
+    if tipo == "pix" and not valor:
+        return redirect("/aviso?msg=Digite o valor")
+
+
     dados = f"tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
+
 
     preference_data = {
         "items": [
@@ -52,6 +74,7 @@ def pagar():
 
         "auto_return": "approved"
     }
+
 
     preference = sdk.preference().create(preference_data)
 
@@ -114,7 +137,6 @@ def gerar():
 62070503***
 6304
 """
-
 
     else:
         return redirect("/aviso?msg=Tipo invalido")
