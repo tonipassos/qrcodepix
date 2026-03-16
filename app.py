@@ -27,7 +27,7 @@ def pagar():
                 "title": "Gerar QR Code",
                 "quantity": 1,
                 "currency_id": "BRL",
-                "unit_price": 5
+                "unit_price": 5.0
             }
         ],
         "back_urls": {
