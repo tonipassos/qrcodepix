@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, send_file, redirect
 import mercadopago
 import qrcode
+from io import BytesIO
 
 app = Flask(__name__)
 
-sdk = mercadopago.SDK("APP_USR-7805412692690237-072118-7991a0a58b9308b5461fdca4530de68d__LC_LB__-219875516")
+sdk = mercadopago.SDK("SEU_TOKEN_AQUI")
 
 pagamento_ok = False
 
@@ -62,19 +63,24 @@ def gerar():
     if not pagamento_ok:
         return "Pagamento não confirmado"
 
-    link = request.args.get("link")
+    # aceita GET ou POST
+    link = request.args.get("link") or request.form.get("link")
 
     if not link:
         return "Link vazio"
 
-    import qrcode
-
     img = qrcode.make(link)
 
-    caminho = "qr.png"
-    img.save(caminho)
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
 
-    return send_file(caminho, as_attachment=True)
+    return send_file(
+        buf,
+        mimetype="image/png",
+        as_attachment=True,
+        download_name="qrcode.png"
+    )
 
 
 app.run(host="0.0.0.0", port=10000)
