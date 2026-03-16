@@ -6,7 +6,6 @@ import os
 
 app = Flask(__name__)
 
-# TOKEN do Render Environment
 token = os.environ.get("MP_TOKEN")
 
 sdk = mercadopago.SDK(token)
@@ -16,7 +15,21 @@ sdk = mercadopago.SDK(token)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+
+    link = request.args.get("link", "")
+    chave = request.args.get("chave", "")
+    nome = request.args.get("nome", "")
+    tipo = request.args.get("tipo", "")
+    msg = request.args.get("msg", "")
+
+    return render_template(
+        "index.html",
+        link=link,
+        chave=chave,
+        nome=nome,
+        tipo=tipo,
+        msg=msg
+    )
 
 
 # ---------------- PAGAR ----------------
@@ -30,15 +43,15 @@ def pagar():
     chave = request.form.get("chave")
     nome = request.form.get("nome")
 
-    # validação
-
     if not tipo:
-        return redirect("/aviso?msg=Escolha o tipo")
+        return redirect("/?msg=Escolha o tipo")
 
     if tipo == "site":
 
         if not link:
-            return redirect("/aviso?msg=Digite o link")
+            return redirect(
+                f"/?msg=Digite o link&tipo={tipo}&link={link}"
+            )
 
         dados = f"tipo=site&link={link}"
 
@@ -46,16 +59,20 @@ def pagar():
     elif tipo == "pix":
 
         if not chave:
-            return redirect("/aviso?msg=Digite a chave PIX")
+            return redirect(
+                f"/?msg=Digite a chave&tipo={tipo}&chave={chave}&nome={nome}"
+            )
 
         if not nome:
-            return redirect("/aviso?msg=Digite o nome")
+            return redirect(
+                f"/?msg=Digite o nome&tipo={tipo}&chave={chave}&nome={nome}"
+            )
 
         dados = f"tipo=pix&chave={chave}&nome={nome}"
 
 
     else:
-        return redirect("/aviso?msg=Tipo invalido")
+        return redirect("/?msg=Tipo invalido")
 
 
     preference_data = {
@@ -97,7 +114,7 @@ def sucesso():
     )
 
 
-# ---------------- GERAR QR ----------------
+# ---------------- GERAR ----------------
 
 @app.route("/gerar")
 def gerar():
@@ -109,7 +126,7 @@ def gerar():
         link = request.args.get("link")
 
         if not link:
-            return redirect("/aviso?msg=Link vazio")
+            return redirect("/?msg=Link vazio")
 
         dados = link
 
@@ -120,16 +137,16 @@ def gerar():
         nome = request.args.get("nome")
 
         if not chave:
-            return redirect("/aviso?msg=Chave vazia")
+            return redirect("/?msg=Chave vazia")
 
         if not nome:
-            return redirect("/aviso?msg=Nome vazio")
+            return redirect("/?msg=Nome vazio")
 
         dados = f"PIX:{chave}:{nome}"
 
 
     else:
-        return redirect("/aviso?msg=Tipo invalido")
+        return redirect("/?msg=Tipo invalido")
 
 
     img = qrcode.make(dados)
@@ -146,7 +163,7 @@ def gerar():
     )
 
 
-# ---------------- PAGINAS ----------------
+# ---------------- ERRO ----------------
 
 @app.route("/erro")
 def erro():
@@ -156,12 +173,6 @@ def erro():
 @app.route("/cancelar")
 def cancelar():
     return render_template("cancelar.html")
-
-
-@app.route("/aviso")
-def aviso():
-    msg = request.args.get("msg")
-    return render_template("aviso.html", msg=msg)
 
 
 # ---------------- RUN ----------------
