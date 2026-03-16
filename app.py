@@ -1,18 +1,26 @@
-from flask import Flask
+from flask import Flask, render_template, request, send_file, redirect
 import mercadopago
+import qrcode
+from io import BytesIO
 import os
 
 app = Flask(__name__)
 
+
+# TOKEN pelo Environment do Render
 token = os.environ.get("MP_TOKEN")
 
 sdk = mercadopago.SDK(token)
 
 
+# ---------------- HOME ----------------
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
+
+# ---------------- PAGAR ----------------
 
 @app.route("/pagar", methods=["POST"])
 def pagar():
@@ -24,7 +32,6 @@ def pagar():
     cidade = request.form.get("cidade")
     valor = request.form.get("valor")
 
-    # salvar tudo na URL
     dados = f"tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
 
     preference_data = {
@@ -36,12 +43,13 @@ def pagar():
                 "unit_price": 5
             }
         ],
+
         "back_urls": {
-    "success": "https://qrcodepix-zscq.onrender.com/sucesso",
-    "failure": "https://qrcodepix-zscq.onrender.com/erro",
-    "pending": "https://qrcodepix-zscq.onrender.com/cancelar"
-},
+            "success": "https://qrcodepix-zscq.onrender.com/sucesso?" + dados,
+            "failure": "https://qrcodepix-zscq.onrender.com/erro",
+            "pending": "https://qrcodepix-zscq.onrender.com/cancelar"
         },
+
         "auto_return": "approved"
     }
 
@@ -49,6 +57,8 @@ def pagar():
 
     return redirect(preference["response"]["init_point"])
 
+
+# ---------------- SUCESSO ----------------
 
 @app.route("/sucesso")
 def sucesso():
@@ -65,6 +75,8 @@ def sucesso():
     )
 
 
+# ---------------- GERAR QR ----------------
+
 @app.route("/gerar")
 def gerar():
 
@@ -75,7 +87,7 @@ def gerar():
         link = request.args.get("link")
 
         if not link:
-            return "Link vazio"
+            return redirect("/aviso?msg=Link vazio")
 
         dados = link
 
@@ -88,7 +100,7 @@ def gerar():
         valor = request.args.get("valor")
 
         if not chave:
-            return "Chave vazia"
+            return redirect("/aviso?msg=Chave PIX vazia")
 
         dados = f"""
 000201
@@ -105,7 +117,7 @@ def gerar():
 
 
     else:
-        return "Tipo inválido"
+        return redirect("/aviso?msg=Tipo invalido")
 
 
     img = qrcode.make(dados)
@@ -120,6 +132,10 @@ def gerar():
         as_attachment=True,
         download_name="qrcode.png"
     )
+
+
+# ---------------- PAGINAS ----------------
+
 @app.route("/erro")
 def erro():
     return render_template("erro.html")
@@ -134,6 +150,9 @@ def cancelar():
 def aviso():
     msg = request.args.get("msg")
     return render_template("aviso.html", msg=msg)
+
+
+# ---------------- RUN ----------------
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
