@@ -5,9 +5,10 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-sdk = mercadopago.SDK("SEU_TOKEN_AQUI")
+sdk = mercadopago.SDK("SEU_TOKEN")
 
 pagamento_ok = False
+link_salvo = ""
 
 
 @app.route("/")
@@ -21,6 +22,11 @@ def pagar():
     global pagamento_ok
     pagamento_ok = False
 
+    link = request.args.get("link")
+
+    if not link:
+        return "Link não enviado"
+
     preference_data = {
         "items": [
             {
@@ -30,46 +36,43 @@ def pagar():
                 "unit_price": 5
             }
         ],
-
         "back_urls": {
-            "success": "https://qrcodepix.onrender.com/sucesso",
+            "success": "https://qrcodepix.onrender.com/sucesso?link=" + link,
             "failure": "https://qrcodepix.onrender.com/erro"
         },
-
         "auto_return": "approved"
     }
 
     preference = sdk.preference().create(preference_data)
 
-    link = preference["response"]["init_point"]
-
-    return redirect(link)
+    return redirect(preference["response"]["init_point"])
 
 
 @app.route("/sucesso")
 def sucesso():
 
     global pagamento_ok
+    global link_salvo
+
     pagamento_ok = True
+    link_salvo = request.args.get("link")
 
     return render_template("sucesso.html")
 
 
-@app.route("/gerar", methods=["GET", "POST"])
+@app.route("/gerar")
 def gerar():
 
     global pagamento_ok
+    global link_salvo
 
     if not pagamento_ok:
         return "Pagamento não confirmado"
 
-    # aceita GET ou POST
-    link = request.args.get("link") or request.form.get("link")
-
-    if not link:
+    if not link_salvo:
         return "Link vazio"
 
-    img = qrcode.make(link)
+    img = qrcode.make(link_salvo)
 
     buf = BytesIO()
     img.save(buf, format="PNG")
@@ -84,5 +87,3 @@ def gerar():
 
 
 app.run(host="0.0.0.0", port=10000)
-
-
