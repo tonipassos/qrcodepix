@@ -37,8 +37,10 @@ def pagar():
             }
         ],
         "back_urls": {
-            "success": "https://qrcodepix-zscq.onrender.com/sucesso?" + dados,
-            "failure": "https://qrcodepix-zscq.onrender.com/erro"
+    "success": "https://qrcodepix-zscq.onrender.com/sucesso",
+    "failure": "https://qrcodepix-zscq.onrender.com/erro",
+    "pending": "https://qrcodepix-zscq.onrender.com/cancelar"
+},
         },
         "auto_return": "approved"
     }
