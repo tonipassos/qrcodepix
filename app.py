@@ -16,16 +16,15 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/pagar")
+@app.route("/pagar", methods=["GET", "POST"])
 def pagar():
 
-    global pagamento_ok
-    pagamento_ok = False
-
-    link = request.args.get("link")
+    link = request.values.get("link")
 
     if not link:
         return "Link não enviado"
+
+    return "OK"
 
     preference_data = {
         "items": [
