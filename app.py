@@ -16,10 +16,15 @@ def home():
 @app.route("/pagar", methods=["POST"])
 def pagar():
 
+    tipo = request.form.get("tipo")
     link = request.form.get("link")
+    chave = request.form.get("chave")
+    nome = request.form.get("nome")
+    cidade = request.form.get("cidade")
+    valor = request.form.get("valor")
 
-    if not link:
-        return "Link não enviado"
+    # salvar tudo na URL
+    dados = f"tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
 
     preference_data = {
         "items": [
@@ -27,11 +32,11 @@ def pagar():
                 "title": "Gerar QR Code",
                 "quantity": 1,
                 "currency_id": "BRL",
-                "unit_price": 5.0
+                "unit_price": 5
             }
         ],
         "back_urls": {
-            "success": "https://qrcodepix-zscq.onrender.com/sucesso?link=" + link,
+            "success": "https://qrcodepix-zscq.onrender.com/sucesso?" + dados,
             "failure": "https://qrcodepix-zscq.onrender.com/erro"
         },
         "auto_return": "approved"
@@ -45,23 +50,62 @@ def pagar():
 @app.route("/sucesso")
 def sucesso():
 
+    tipo = request.args.get("tipo")
     link = request.args.get("link")
+    chave = request.args.get("chave")
+    nome = request.args.get("nome")
+    cidade = request.args.get("cidade")
+    valor = request.args.get("valor")
 
-    if not link:
-        return "Link não encontrado"
-
-    return redirect("/gerar?link=" + link)
+    return redirect(
+        f"/gerar?tipo={tipo}&link={link}&chave={chave}&nome={nome}&cidade={cidade}&valor={valor}"
+    )
 
 
 @app.route("/gerar")
 def gerar():
 
-    link = request.args.get("link")
+    tipo = request.args.get("tipo")
 
-    if not link:
-        return "Link vazio"
+    if tipo == "site":
 
-    img = qrcode.make(link)
+        link = request.args.get("link")
+
+        if not link:
+            return "Link vazio"
+
+        dados = link
+
+
+    elif tipo == "pix":
+
+        chave = request.args.get("chave")
+        nome = request.args.get("nome")
+        cidade = request.args.get("cidade")
+        valor = request.args.get("valor")
+
+        if not chave:
+            return "Chave vazia"
+
+        dados = f"""
+000201
+26360014BR.GOV.BCB.PIX01{len(chave):02}{chave}
+52040000
+5303986
+54{len(valor):02}{valor}
+5802BR
+59{len(nome):02}{nome}
+60{len(cidade):02}{cidade}
+62070503***
+6304
+"""
+
+
+    else:
+        return "Tipo inválido"
+
+
+    img = qrcode.make(dados)
 
     buf = BytesIO()
     img.save(buf, format="PNG")
