@@ -118,7 +118,20 @@ def gerar():
         as_attachment=True,
         download_name="qrcode.png"
     )
+@app.route("/erro")
+def erro():
+    return render_template("erro.html")
 
+
+@app.route("/cancelar")
+def cancelar():
+    return render_template("cancelar.html")
+
+
+@app.route("/aviso")
+def aviso():
+    msg = request.args.get("msg")
+    return render_template("aviso.html", msg=msg)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
